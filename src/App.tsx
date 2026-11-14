@@ -101,6 +101,7 @@ export default function App() {
       <button
         type="button"
         onClick={() => dispatch({ type: 'clearDone' })}
+        disabled={counts.done === 0}
       >
         Clear done
       </button>
