@@ -1,0 +1,30 @@
+// Requirement R4: write these two pure functions. No React in this file.
+import type { Status, Task } from './taskReducer'
+
+export type Filter = 'all' | Status
+
+export const FILTERS: Filter[] = [
+  'all',
+  'todo',
+  'in-progress',
+  'done',
+]
+
+export function filterTasks(tasks: Task[], filter: Filter): Task[] {
+  if (filter === 'all') {
+    return tasks
+  }
+
+  return tasks.filter((task) => task.status === filter)
+}
+
+export function countByFilter(tasks: Task[]): Record<Filter, number> {
+  return {
+    all: tasks.length,
+    todo: tasks.filter((task) => task.status === 'todo').length,
+    'in-progress': tasks.filter(
+      (task) => task.status === 'in-progress',
+    ).length,
+    done: tasks.filter((task) => task.status === 'done').length,
+  }
+}
