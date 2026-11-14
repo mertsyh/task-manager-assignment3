@@ -12,13 +12,15 @@ export type Task = {
 }
 
 export type State = {
-    tasks: Task[]
-    filter: Filter
+  tasks: Task[]
+  filter: Filter
+  past: Task[][]
 }
 
 export const initialState: State = {
-    tasks: [],
-    filter: 'all',
+  tasks: [],
+  filter: 'all',
+  past: [],
 }
 
 export type Action =
@@ -27,6 +29,7 @@ export type Action =
     | { type: 'remove'; id: string }
     | { type: 'setFilter'; filter: Filter }
     | { type: 'clearDone' }
+    | { type: 'undo' }
 
 const NEXT: Record<Status, Status> = {
     todo: 'in-progress',
@@ -39,6 +42,7 @@ export function taskReducer(state: State, action: Action): State {
         case 'add':
             return {
                 ...state,
+                past: [...state.past, state.tasks],
                 tasks: [
                     ...state.tasks,
                     {
@@ -52,6 +56,7 @@ export function taskReducer(state: State, action: Action): State {
         case 'advance':
             return {
                 ...state,
+                past: [...state.past, state.tasks],
                 tasks: state.tasks.map((task) =>
                     task.id === action.id
                         ? { ...task, status: NEXT[task.status] }
@@ -62,6 +67,7 @@ export function taskReducer(state: State, action: Action): State {
         case 'remove':
             return {
                 ...state,
+                past: [...state.past, state.tasks],
                 tasks: state.tasks.filter((task) => task.id !== action.id),
             }
 
@@ -72,12 +78,27 @@ export function taskReducer(state: State, action: Action): State {
             }
 
         case 'clearDone':
-            return {
-                ...state,
-                tasks: state.tasks.filter((task) => task.status !== 'done'),
-            }
-    }
+      return {
+        ...state,
+        past: [...state.past, state.tasks],
+        tasks: state.tasks.filter((task) => task.status !== 'done'),
+      }
 
-    const unhandledAction: never = action
-    return unhandledAction
-}
+    case 'undo': {
+      const previousTasks = state.past[state.past.length - 1]
+
+      if (previousTasks === undefined) {
+        return state
+      }
+
+      return {
+        ...state,
+        tasks: previousTasks,
+        past: state.past.slice(0, -1),
+      }
+    } 
+  } 
+
+  const unhandledAction: never = action
+  return unhandledAction
+} // taskReducer fonksiyonunun sonu

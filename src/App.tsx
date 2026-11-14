@@ -104,7 +104,13 @@ export default function App() {
       >
         Clear done
       </button>
-
+        <button
+  type="button"
+  disabled={state.past.length === 0}
+  onClick={() => dispatch({ type: 'undo' })}
+>
+  Undo
+       </button>
       <TaskList tasks={visibleTasks} dispatch={dispatch} />
     </main>
   )
